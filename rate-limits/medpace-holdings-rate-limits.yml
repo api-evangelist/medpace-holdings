@@ -4,84 +4,48 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: Medpace Holdings
 providerId: medpace-holdings
 created: '2026-05-04'
-modified: '2026-05-04'
+modified: '2026-05-05'
+reconciled: false
 tags:
   - Clinical Research
   - CRO
   - Biotech
   - Rate Limiting
-  - Quotas
-  - Throttling
-description: Machine-readable rate limit definitions for the Medpace Holdings API surface. Captures per-tier
-  quotas, burst behavior, response signaling, and recovery semantics. Defaults are scaffold values to
-  be replaced with published provider limits.
-headers:
-  limit: X-RateLimit-Limit
-  remaining: X-RateLimit-Remaining
-  reset: X-RateLimit-Reset
-  retryAfter: Retry-After
-  policy: RateLimit-Policy
+description: Medpace does not publish API rate limits. Sponsor-facing systems (ClinTrak EDC, IRT, eTMF)
+  are accessed by study staff under role-based access control; programmatic integration with sponsor
+  data warehouses (e.g. CDISC ODM / Define-XML exports, SAS transport, FHIR for source data verification)
+  is governed by the study contract and the system's validated production controls (21 CFR Part 11,
+  GDPR / HIPAA).
+notes: |
+  No public rate-limit documentation. Limits are governed per study and per validated system rather
+  than by a developer-facing throttle.
+sources:
+  - https://www.medpace.com/
 responseCodes:
   throttled: 429
-  quotaExceeded: 429
   serviceUnavailable: 503
 limits:
-  - tier: free
-    name: Free Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 10
-    burst: 20
-    timeFrame: minute
+  - name: Study system access
+    scope: study
+    metric: varies
+    limit: 'governed by study contract & validated system controls'
     applies:
       - Medpace Holdings API
-  - tier: free
-    name: Free Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 1000
-    timeFrame: month
-    applies:
-      - Medpace Holdings API
-  - tier: professional
-    name: Professional Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 100
-    burst: 200
-    timeFrame: minute
-    applies:
-      - Medpace Holdings API
-  - tier: professional
-    name: Professional Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 100000
-    timeFrame: month
-    applies:
-      - Medpace Holdings API
-  - tier: enterprise
-    name: Enterprise Negotiated Limit
-    scope: contract
-    metric: requests_per_minute
-    limit: 1000
-    burst: 5000
-    timeFrame: minute
-    applies:
-      - Medpace Holdings API
+    notes: Access to ClinTrak EDC, IRT, eTMF and related systems is granted to qualified study staff and
+      authorized sponsor users; programmatic limits live in the validated system's specification.
 policies:
   - name: Backoff Strategy
-    description: Clients should implement exponential backoff with jitter, honoring the Retry-After header
-      when present.
-  - name: Burst Handling
-    description: Short bursts above the steady-state limit are tolerated up to the documented burst ceiling
-      before throttling engages.
-  - name: Quota Reset
-    description: Monthly quotas reset at the start of each calendar month in UTC. Per-minute and per-second
-      windows reset on a sliding-window basis.
-  - name: Fair Use
-    description: Even on uncapped enterprise tiers, sustained usage that materially impacts shared infrastructure
-      may be subject to fair-use throttling.
+    description: Use exponential backoff with jitter on transient errors and honor Retry-After when
+      present.
+  - name: 21 CFR Part 11 Audit Trail
+    description: All access and modifications to GxP data must be captured in the validated system's
+      audit trail; integrations must avoid bypassing identity / role controls.
+  - name: Validated System Controls
+    description: Throughput and concurrency obligations are part of each system's specification and
+      validated change control. Increasing throughput requires assessment / requalification.
+  - name: Data Privacy Boundaries
+    description: GDPR (EU) and HIPAA (US) constraints govern subject-level data access; integrations
+      must respect study-level data residency and pseudonymization rules.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

@@ -1,5 +1,6 @@
 specification: FinOps Framework
 specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
 alignedWith:
   framework: FinOps Foundation Framework
   frameworkUrl: https://www.finops.org/framework/
@@ -8,35 +9,43 @@ alignedWith:
   dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
 provider: Medpace Holdings
 providerId: medpace-holdings
-publisherName: Medpace Holdings
-serviceCategory: API
+publisherName: Medpace Holdings, Inc.
+serviceCategory: Contract Research Organization (CRO)
 created: '2026-05-04'
-modified: '2026-05-04'
+modified: '2026-05-05'
+reconciled: false
 tags:
   - Clinical Research
   - CRO
   - Biotech
   - FinOps
-  - Cost Management
   - FOCUS
-description: FinOps framework definition for the Medpace Holdings API surface. Provides a FOCUS-aligned
-  mapping for cost allocation, usage measurement, and unit-economics reporting across the provider's APIs.
+description: 'FOCUS-aligned FinOps shape for Medpace Holdings: clinical trial services priced per study
+  via SOW with fixed-price service fees, per-subject / per-visit unit pricing, and pass-through costs.
+  FinOps focus is study-level financial management rather than per-API-call billing.'
+notes: |
+  No public per-API pricing. Cost is allocated per study / protocol; meters represent clinical-trial
+  economic units (subjects enrolled, visits, sites, deliverable milestones).
+sources:
+  - https://www.medpace.com/
 principles:
   - name: Visibility
-    description: Make API consumption costs visible to engineering, product, and finance teams in near
-      real-time.
+    description: Track study burn against budget via the SOW and PM dashboard; reconcile invoices to
+      enrollment milestones (first patient in, last patient last visit) and pass-through receipts.
   - name: Allocation
-    description: Tag every chargeable API call with the consuming team, environment, application, and
-      feature so cost can be allocated.
+    description: Allocate by study / protocol / phase / therapeutic area. For sponsors with multi-study
+      portfolios, allocate to clinical program and indication, and break out pass-through (investigator
+      grants, central labs, courier) from service fees.
   - name: Optimization
-    description: Continuously evaluate request patterns, caching, batching, and tier selection to reduce
-      cost per useful unit of work.
+    description: Optimize protocol design (visit count, complexity), select sites by historical enrollment
+      and quality data, and choose appropriate Medpace service modules (full-service vs functional service
+      provision) per study.
   - name: Accountability
-    description: Establish budget owners and chargeback or showback flows for each consuming team.
+    description: Assign a sponsor study lead per protocol who reviews monthly burn, change orders, and
+      milestone delivery with the Medpace project manager.
 domains:
   - name: Understand Usage and Cost
     capabilities:
-      - Data Ingestion
       - Allocation
       - Reporting and Analytics
       - Anomaly Management
@@ -45,70 +54,72 @@ domains:
       - Planning and Estimating
       - Forecasting
       - Budgeting
-      - Benchmarking
       - Unit Economics
   - name: Optimize Usage and Cost
     capabilities:
-      - Architecting for Cloud
-      - Rate Optimization
       - Workload Optimization
-      - Cloud Sustainability
       - Licensing and SaaS
   - name: Manage the FinOps Practice
     capabilities:
-      - FinOps Practice Operations
-      - FinOps Education and Enablement
       - Invoicing and Chargeback
       - Onboarding Workloads
-      - Intersecting Disciplines
 billingModel:
-  pricingCategory: Usage-Based
-  billingFrequency: Monthly
-  billingCurrency: USD
+  pricingCategory: Per-Study SOW (Fixed + Per-Subject + Pass-Through)
+  billingFrequency: Per-Milestone / Monthly
+  billingCurrency: USD (settlement varies)
   chargeCategories:
-    - Usage
     - Purchase
-    - Tax
-    - Credit
+    - Usage
     - Adjustment
-  chargeFrequency: Recurring
+    - Credit
 focusColumns:
-  ServiceName: Medpace Holdings
-  ServiceCategory: Developer Tools / API
-  ProviderName: Medpace Holdings
-  PublisherName: Medpace Holdings
-  InvoiceIssuerName: Medpace Holdings
-  PricingCategory: Usage-Based
-  PricingUnit: request
+  ServiceName: Medpace Clinical Trial Services
+  ServiceCategory: Contract Research Organization (CRO)
+  ProviderName: Medpace
+  PublisherName: Medpace Holdings, Inc.
+  InvoiceIssuerName: Medpace Holdings, Inc.
   BillingCurrency: USD
-  ChargeCategory: Usage
+  ChargeCategory: Purchase
 meters:
-  - name: api_requests
-    description: Count of billable API requests
-    unit: request
+  - name: study_service_fee
+    description: Fixed-price service fee per study, recognized against milestones.
+    unit: study-milestone
     aggregation: sum
     dimensions:
-      - api
-      - endpoint
-      - tier
-      - region
-      - consumer
-  - name: data_egress
-    description: Bytes returned over the network in API responses
-    unit: GB
+      - study
+      - phase
+      - therapeutic_area
+  - name: subjects_enrolled
+    description: Subjects enrolled / randomized in the study.
+    unit: subject
     aggregation: sum
     dimensions:
-      - api
-      - region
-      - consumer
-  - name: compute_seconds
-    description: Server-side compute consumed by the request, where applicable
-    unit: second
+      - study
+      - site
+      - country
+  - name: subject_visits
+    description: Protocol-defined visits completed.
+    unit: visit
     aggregation: sum
     dimensions:
-      - api
-      - endpoint
-      - tier
+      - study
+      - visit_type
+      - site
+  - name: pass_through_costs
+    description: Pass-through costs (investigator grants, central labs, IRB / EC, courier).
+    unit: USD
+    aggregation: sum
+    dimensions:
+      - study
+      - cost_type
+      - vendor
+  - name: change_orders
+    description: Approved change orders amending the SOW.
+    unit: USD
+    aggregation: sum
+    dimensions:
+      - study
+      - reason_code
 apis:
   - name: Medpace Holdings API
     baseURL: https://api.medpace.com
@@ -119,11 +130,11 @@ apis:
     serviceName: Medpace Holdings API
     serviceCategory: API
 unitEconomics:
-  - name: Cost per 1K Requests
-    metric: billed_cost / (api_requests / 1000)
+  - name: Cost per Enrolled Subject
+    metric: billed_cost / subjects_enrolled
     target: TBD
-  - name: Cost per Active Consumer
-    metric: billed_cost / active_consumers
+  - name: Cost per Visit
+    metric: billed_cost / subject_visits
     target: TBD
 maintainers:
   - FN: Kin Lane
