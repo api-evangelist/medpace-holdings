@@ -28,6 +28,10 @@ apis:
     description: >-
       The Medpace Holdings API provides access to platform services and data for enterprise integration and automation.
 common:
+  - type: GitHubOrganization
+    url: https://github.com/Medpace
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/medpace
   - type: Website
     url: https://www.medpace.com
 maintainers:
