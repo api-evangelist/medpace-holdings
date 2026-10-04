@@ -29,6 +29,10 @@ image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/medpace-ho
 tags:
   - Clinical Research
   - CRO
+  - Biotechnology
+tags_raw:
+  - Clinical Research
+  - CRO
   - Biotech
 description: >-
   Medpace Holdings is a major US corporation and Fortune 1000 company. The Medpace Holdings API provides programmatic access to its platform services, data, and integrations for enterprise customers and partners.
@@ -39,6 +43,10 @@ apis:
   - aid: medpace-holdings:medpace-holdings-api
     name: Medpace Holdings API
     tags:
+      - Clinical Research
+      - CRO
+      - Biotechnology
+    tags_raw:
       - Clinical Research
       - CRO
       - Biotech
