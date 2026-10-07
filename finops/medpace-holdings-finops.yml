@@ -135,10 +135,8 @@ apis:
 unitEconomics:
   - name: Cost per Enrolled Subject
     metric: billed_cost / subjects_enrolled
-    target: TBD
   - name: Cost per Visit
     metric: billed_cost / subject_visits
-    target: TBD
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
